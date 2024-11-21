@@ -1,0 +1,28 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "API para obtener datos de criptomonedas y realizar operaciones simuladas.",
+        "title": "Crypto API",
+        "termsOfService": "http://swagger.io/terms/",
+        "contact": {
+            "name": "Soporte Crypto",
+            "url": "http://www.crypto.com/support",
+            "email": "support@crypto.com"
+        },
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        },
+        "version": "1.0"
+    },
+    "host": "localhost:8080",
+    "basePath": "/",
+    "paths": {},
+    "securityDefinitions": {
+        "BearerAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
+    }
+}
