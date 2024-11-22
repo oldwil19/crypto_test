@@ -1,21 +1,60 @@
-basePath: /
-host: localhost:8080
+definitions:
+  application.AddBalanceRequest:
+    properties:
+      amount:
+        type: number
+    required:
+    - amount
+    type: object
 info:
-  contact:
-    email: support@crypto.com
-    name: Soporte Crypto
-    url: http://www.crypto.com/support
-  description: API para obtener datos de criptomonedas y realizar operaciones simuladas.
-  license:
-    name: Apache 2.0
-    url: http://www.apache.org/licenses/LICENSE-2.0.html
-  termsOfService: http://swagger.io/terms/
-  title: Crypto API
-  version: "1.0"
-paths: {}
-securityDefinitions:
-  BearerAuth:
-    in: header
-    name: Authorization
-    type: apiKey
+  contact: {}
+paths:
+  /account/balance/add:
+    post:
+      consumes:
+      - application/json
+      description: Permite añadir saldo en USD al balance del usuario autenticado.
+        Requiere un token JWT válido.
+      parameters:
+      - default: Bearer <token>
+        description: Token JWT
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Cuerpo de la solicitud para añadir saldo, con el monto en USD
+        in: body
+        name: AddBalanceRequest
+        required: true
+        schema:
+          $ref: '#/definitions/application.AddBalanceRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Respuesta exitosa con mensaje y balance actualizado
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: 'Error de validación: La cantidad ingresada es inválida'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: 'Error de usuario: Usuario no encontrado'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: 'Error interno: No se pudo actualizar la información del usuario'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Añadir saldo al usuario
+      tags:
+      - Account
 swagger: "2.0"
