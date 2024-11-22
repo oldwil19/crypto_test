@@ -8,61 +8,64 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// AuthController gestiona las operaciones de autenticación. Aquí están los endpoints como el login.
+// LoginRequest representa las credenciales requeridas para iniciar sesión.
+// @Description Estructura del cuerpo de la solicitud para el endpoint de login.
+type LoginRequest struct {
+	Username string `json:"username" binding:"required"` // El nombre de usuario debe ser obligatorio.
+	Password string `json:"password" binding:"required"` // La contraseña debe ser obligatoria.
+}
+
+// AuthController gestiona las operaciones de autenticación.
 type AuthController struct {
 	jwtService infrastructure.JWTServiceInterface
 	userRepo   domain.UserRepository
 }
 
 // NewAuthController crea una instancia de AuthController.
-// Este es el punto donde inyectamos las dependencias principales.
 func NewAuthController(jwtService infrastructure.JWTServiceInterface, userRepo domain.UserRepository) *AuthController {
 	return &AuthController{jwtService: jwtService, userRepo: userRepo}
 }
 
-// Login permite a los usuarios autenticarse.
-/*
-Nota: Esta función maneja el proceso de inicio de sesión.
-Futuro: Quizás incluir métricas para ver intentos fallidos por usuario o IP.
-*/
+// Login godoc
+// @Summary Autenticación de usuarios
+// @Description Permite a los usuarios autenticarse y obtener un token JWT para acceder a los endpoints protegidos.
+// @Tags Auth
+// @Accept json
+// @Produce json
+// @Param LoginRequest body LoginRequest true "Credenciales del usuario para autenticación"
+// @Success 200 {object} map[string]string "Token JWT generado para el usuario autenticado"
+// @Failure 400 {object} map[string]string "Error en la validación de datos enviados"
+// @Failure 401 {object} map[string]string "Credenciales inválidas o usuario no encontrado"
+// @Failure 500 {object} map[string]string "Error interno al generar el token"
+// @Router /auth/login [post]
 func (ac *AuthController) Login(c *gin.Context) {
-	var request struct {
-		Username string `json:"username" binding:"required"` // Validar que el username siempre esté presente.
-		Password string `json:"password" binding:"required"` // Igual con el password.
-	}
+	var request LoginRequest
 
-	// Aquí validamos los datos enviados en el body.
+	// Validar los datos enviados en el cuerpo de la solicitud.
 	if err := c.ShouldBindJSON(&request); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Datos inválidos"})
 		return
 	}
 
-	// Intentamos buscar el usuario en la base de datos.
+	// Intentar buscar el usuario en la base de datos.
 	user, err := ac.userRepo.FindByUsername(request.Username)
 	if err != nil || user == nil {
-		// Mensaje genérico para evitar revelar si el usuario existe.
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Usuario o contraseña incorrectos"})
 		return
 	}
 
-	// Validamos la contraseña usando el método en el modelo de usuario.
+	// Verificar la contraseña.
 	if err := user.VerifyPassword(request.Password); err != nil {
-		// Este mensaje sigue siendo genérico por seguridad.
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Usuario o contraseña incorrectos"})
 		return
 	}
 
-	// Generamos el token JWT para el usuario autenticado.
+	// Generar el token JWT.
 	token, err := ac.jwtService.GenerateToken(user.ID)
 	if err != nil {
-		/*
-			Esto no debería fallar en condiciones normales.
-			Futuro: Quizás loggear más detalles del error o agregar una alerta si pasa mucho.
-		*/
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "No se pudo generar el token"})
 		return
 	}
 
-	// Respondemos con el token al cliente.
 	c.JSON(http.StatusOK, gin.H{"token": token})
 }

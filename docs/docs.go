@@ -84,6 +84,70 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/auth/login": {
+            "post": {
+                "description": "Permite a los usuarios autenticarse y obtener un token JWT para acceder a los endpoints protegidos.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Autenticación de usuarios",
+                "parameters": [
+                    {
+                        "description": "Credenciales del usuario para autenticación",
+                        "name": "LoginRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/application.LoginRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Token JWT generado para el usuario autenticado",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Error en la validación de datos enviados",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Credenciales inválidas o usuario no encontrado",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno al generar el token",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -95,6 +159,24 @@ const docTemplate = `{
             "properties": {
                 "amount": {
                     "type": "number"
+                }
+            }
+        },
+        "application.LoginRequest": {
+            "description": "Estructura del cuerpo de la solicitud para el endpoint de login.",
+            "type": "object",
+            "required": [
+                "password",
+                "username"
+            ],
+            "properties": {
+                "password": {
+                    "description": "La contraseña debe ser obligatoria.",
+                    "type": "string"
+                },
+                "username": {
+                    "description": "El nombre de usuario debe ser obligatorio.",
+                    "type": "string"
                 }
             }
         }

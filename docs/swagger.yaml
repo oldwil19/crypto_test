@@ -6,6 +6,19 @@ definitions:
     required:
     - amount
     type: object
+  application.LoginRequest:
+    description: Estructura del cuerpo de la solicitud para el endpoint de login.
+    properties:
+      password:
+        description: La contraseña debe ser obligatoria.
+        type: string
+      username:
+        description: El nombre de usuario debe ser obligatorio.
+        type: string
+    required:
+    - password
+    - username
+    type: object
 info:
   contact: {}
 paths:
@@ -57,4 +70,47 @@ paths:
       summary: Añadir saldo al usuario
       tags:
       - Account
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Permite a los usuarios autenticarse y obtener un token JWT para
+        acceder a los endpoints protegidos.
+      parameters:
+      - description: Credenciales del usuario para autenticación
+        in: body
+        name: LoginRequest
+        required: true
+        schema:
+          $ref: '#/definitions/application.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Token JWT generado para el usuario autenticado
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Error en la validación de datos enviados
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Credenciales inválidas o usuario no encontrado
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Error interno al generar el token
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Autenticación de usuarios
+      tags:
+      - Auth
 swagger: "2.0"

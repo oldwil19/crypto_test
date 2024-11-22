@@ -574,7 +574,28 @@ Response
 Este proyecto fue desarrollado con los principios SOLID, Clean Code y una arquitectura basada en dominios (DDD). Se utilizaron contenedores Docker para simplificar la implementación y CoinGecko para obtener datos de mercado.
 
 
+## HelthCheck
 
+accede aca, es basico pero extensible.
+
+```
+http://localhost/healthz
+```
+
+## Documentaciones con swagger
+
+para acceder a la docuementacion
+aca
+
+```
+http://localhost/swagger/index.html
+```
+
+para generar documentacion
+
+```
+swag init --generalInfo cmd/server/main.go --output ./docs
+```
 
 ## **Requerimientos y Cumplimiento**
 
